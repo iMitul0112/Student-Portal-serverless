@@ -1,0 +1,184 @@
+service: Student-Portal
+frameworkVersion: '2'
+
+custom:
+  tableName: 'Student-Portal-table-${sls:stage}'
+  userpoolID: !Ref CognitoUserPool
+  userpoolClientID: !Ref UserPoolClient
+  stage: dev
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: '20201221'
+  region: us-east-1
+  apiKeys:
+    - student-portal-exercise-${self:custom.stage}
+  # httpApi:
+  #   cors: true
+  #   authorizers:
+  #     studntjwtauth:
+  #       type: jwt
+  #       identitySource: $request.header.Authorization
+  #       issuerUrl: !Join ["", ["https://cognito-idp.${us-east-1}.amazonaws.com/${}", !Ref CognitUserPool]] 
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [ UsersTable, Arn ]
+        - Effect: Allow
+          Action: 
+            - cognito-idp:*
+          Resource:
+            - Fn::GetAtt: [ CognitoUserPool, Arn ]
+  environment:
+    USERS_TABLE: ${self:custom.tableName}
+    USERPOOL_ID: ${self:custom.userpoolID}
+    USERPOOL_CLIENT_ID: ${self:custom.userpoolClientID}
+
+functions:
+  createSuperAdmin:
+    handler: functions/createSuperAdmin.handler
+    events:
+      - http:
+          path: /superAdmin
+          method: post
+          cors: true
+          private: false
+  createFaculty:
+    handler: functions/createFacultyUser.handler
+    events: 
+      - http:
+          path: /facultyUser
+          method: post
+          cors: true
+          private: false
+  createStudent: 
+    handler: functions/createStudent.handler
+    events: 
+    - http:
+        path: /student
+        method: post
+        cors: true
+        private: false
+  updateStudent:
+    handler: functions/updateStudent.handler
+    events:
+      - http:
+          path: /student
+          method: put
+          cors: false
+          private: false
+  getStudent:
+    handler: functions/getStudent.handler
+    events: 
+      - http:
+          path: /student
+          method: get
+          cors: false
+          private: false
+      
+  # testAPI:
+  #   handler: functions
+      
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          # - AttributeName: email
+          #   AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          # - AttributeName: email
+          #   KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.tableName}
+    
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: student-portal-${self:custom.stage}
+        UsernameAttributes:
+          - email
+        AutoVerifiedAttributes:
+          - email
+        Schema:
+          - Name: email
+            AttributeDataType: String
+            Required: true
+            Mutable: true
+          - Name: departmentNo
+            AttributeDataType: String
+            Required: false
+            Mutable: true
+          - Name: classNo
+            AttributeDataType: String
+            Required: false
+            Mutable: true
+    
+    UserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        UserPoolId:
+          Ref: CognitoUserPool
+        ClientName: "node"
+    
+    CognitoUserPoolGroup1:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId: 
+          Ref: CognitoUserPool
+        GroupName: "superadmin"
+    
+    CognitoUserPoolGroup2:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId: 
+          Ref: CognitoUserPool
+        GroupName: "facultyusers"
+    
+    CognitoUserPoolGroup3:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId:
+          Ref: CognitoUserPool
+        GroupName: "students"
+  
+    # ApiGatewayAuthorizer: 
+    #   Type: AWS::ApiGateway::Authorizer
+    #   Properties: 
+    #     Name: CognitoUserPool
+    #     Type: COGNITO_USER_POOLS
+    #     IdentitySource: method.request.header.Authorization
+    #     RestApiId: 
+    #       Ref: ApiGatewayRestApi
+    #     ProviderARNs: 
+    #       - !GetAtt CognitoUserPool.Arn
+  Outputs:
+    UserPoolId:
+      Value:
+        Ref: CognitoUserPool
+      Export: 
+        Name: UserPoolId-${sls:stage}
+    UserPoolClientId:
+      Value: 
+        Ref: UserPoolClient
+      Export: 
+        Name: UserPoolClientId-${sls:stage}  
+  
+    
+                    
