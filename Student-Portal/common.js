@@ -5,11 +5,12 @@ const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
 const { env: { USERS_TABLE, USERPOOL_ID } } = process
 
 const adminCreateUser = async (username, group, username1) => {
-    console.log("^^^^6");
+    console.log("^^^^6", username);
     const params = { 
         UserPoolId: USERPOOL_ID, 
         Username: username 
       };
+      console.log(params, "PARAMS");
       const STUDENTUSER = await cognitoidentityserviceprovider.adminCreateUser(params).promise()
         try {
           var params3 = {
@@ -17,12 +18,14 @@ const adminCreateUser = async (username, group, username1) => {
             UserPoolId: USERPOOL_ID, 
             Username: username 
           };
+          console.log(params3, "PARAMS3");
           const ADDTOGROUP = await cognitoidentityserviceprovider.adminAddUserToGroup(params3).promise()
           var params1 = {
             UserPoolId: USERPOOL_ID,
             Username: username1
           };
-          const User = await cognitoidentityserviceprovider.adminGetUser(params1).promise();
+          console.log("PARAMS1", params1);
+          // const User = await cognitoidentityserviceprovider.adminGetUser(params1).promise();
           console.log(STUDENTUSER, "DATA");
           const response = {
             statusCode: 200,

@@ -173,7 +173,7 @@ resources:
       Value:
         Ref: CognitoUserPool
       Export: 
-        Name: UserPoolId-${sls:stage}
+        Name: UserPoolId-StudentPortal--${sls:stage}
     UserPoolClientId:
       Value: 
         Ref: UserPoolClient

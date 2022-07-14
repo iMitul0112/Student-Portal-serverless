@@ -29,6 +29,7 @@ const handler = async (event, res) => {
       console.log("STUDENTS");
     
       const result = await adminCreateUser(username, group, obj.username1);
+      console.log(result, "RESULTTTT");
       const userid = result.User.Username;
       const params2 = {
         TableName: USERS_TABLE,
