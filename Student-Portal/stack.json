@@ -1,0 +1,11 @@
+{
+  "UserPoolClientId": "lmu6vbq5tfqnp16ptl4l8bndj",
+  "UserPoolId": "us-east-1_MYzZzPNzj",
+  "CreateFacultyLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:609906240783:function:Student-Portal-dev-createFaculty:42",
+  "UpdateStudentLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:609906240783:function:Student-Portal-dev-updateStudent:33",
+  "GetStudentLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:609906240783:function:Student-Portal-dev-getStudent:31",
+  "CreateSuperAdminLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:609906240783:function:Student-Portal-dev-createSuperAdmin:32",
+  "CreateStudentLambdaFunctionQualifiedArn": "arn:aws:lambda:us-east-1:609906240783:function:Student-Portal-dev-createStudent:39",
+  "ServiceEndpoint": "https://5kq0q75zzc.execute-api.us-east-1.amazonaws.com/dev",
+  "ServerlessDeploymentBucketName": "student-portal-dev-serverlessdeploymentbucket-xids1k99jtio"
+}

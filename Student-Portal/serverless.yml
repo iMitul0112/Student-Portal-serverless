@@ -1,11 +1,25 @@
 service: Student-Portal
 frameworkVersion: '2'
 
+package:
+  individually: true
+  # exclude:
+  #   - 'node_modules/**'
+  #   - '*.js'
+  #   - '*.json'
+  #   - '*.md'
+  #   - 'functions/**'
+
+plugins:
+  - serverless-stack-output
 custom:
   tableName: 'Student-Portal-table-${sls:stage}'
   userpoolID: !Ref CognitoUserPool
   userpoolClientID: !Ref UserPoolClient
   stage: dev
+  output:
+    handler: scripts/output.handler
+    file: stack.json
 
 provider:
   name: aws
@@ -53,6 +67,13 @@ functions:
           method: post
           cors: true
           private: false
+    package:
+      individually: true
+      exclude:
+        - "./**"
+      include:
+        - ./functions/createSuperAdmin.js
+
   createFaculty:
     handler: functions/createFacultyUser.handler
     events: 
@@ -178,7 +199,4 @@ resources:
       Value: 
         Ref: UserPoolClient
       Export: 
-        Name: UserPoolClientId-${sls:stage}  
-  
-    
-                    
+        Name: UserPoolClientId-${sls:stage} 
